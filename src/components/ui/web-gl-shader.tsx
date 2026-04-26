@@ -1,10 +1,12 @@
-"use client"
-
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
+import { useTheme } from "next-themes"
 
 export function WebGLShader() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const { theme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  
   const sceneRef = useRef<{
     scene: THREE.Scene | null
     camera: THREE.OrthographicCamera | null
@@ -20,6 +22,26 @@ export function WebGLShader() {
     uniforms: null,
     animationId: null,
   })
+
+  // Set mounted state
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Handle Theme switching for WebGL
+  useEffect(() => {
+    if (!mounted || !sceneRef.current.renderer) return
+    
+    // Final check for actually active theme
+    const currentTheme = resolvedTheme || theme || "dark"
+    const clearColor = currentTheme === "dark" ? 0x000000 : 0xFFFFFF
+    
+    sceneRef.current.renderer.setClearColor(new THREE.Color(clearColor))
+    
+    if (sceneRef.current.uniforms) {
+      sceneRef.current.uniforms.isDark.value = currentTheme === "dark" ? 1.0 : 0.0
+    }
+  }, [theme, resolvedTheme, mounted])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -41,6 +63,7 @@ export function WebGLShader() {
       uniform float xScale;
       uniform float yScale;
       uniform float distortion;
+      uniform float isDark;
 
       void main() {
         vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
@@ -51,20 +74,31 @@ export function WebGLShader() {
         float gx = p.x;
         float bx = p.x * (1.0 - d);
 
-        float r = 0.05 / abs(p.y + sin((rx + time) * xScale) * yScale);
-        float g = 0.05 / abs(p.y + sin((gx + time) * xScale) * yScale);
-        float b = 0.05 / abs(p.y + sin((bx + time) * xScale) * yScale);
+        // Adjust wave intensity based on background
+        float intensity = isDark > 0.5 ? 0.05 : 0.02;
+
+        float r = intensity / abs(p.y + sin((rx + time) * xScale) * yScale);
+        float g = intensity / abs(p.y + sin((gx + time) * xScale) * yScale);
+        float b = intensity / abs(p.y + sin((bx + time) * xScale) * yScale);
         
-        // Output the raw multi-color RGB wave pattern
+        if (isDark < 0.5) {
+          // On light backgrounds, make colors slightly deeply saturated but not glowing
+          r = pow(r, 0.8) * 0.4;
+          g = pow(g, 0.8) * 0.4;
+          b = pow(b, 0.8) * 0.4;
+        }
+
         gl_FragColor = vec4(r, g, b, 1.0);
       }
     `
 
     const initScene = () => {
       refs.scene = new THREE.Scene()
-      refs.renderer = new THREE.WebGLRenderer({ canvas })
-      refs.renderer.setPixelRatio(window.devicePixelRatio)
-      refs.renderer.setClearColor(new THREE.Color(0x000000))
+      refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      
+      const currentTheme = resolvedTheme || theme || "dark"
+      refs.renderer.setClearColor(new THREE.Color(currentTheme === "dark" ? 0x000000 : 0xFFFFFF))
 
       refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1)
 
@@ -74,6 +108,7 @@ export function WebGLShader() {
         xScale: { value: 1.0 },
         yScale: { value: 0.5 },
         distortion: { value: 0.05 },
+        isDark: { value: currentTheme === "dark" ? 1.0 : 0.0 }
       }
 
       const position = [
@@ -103,7 +138,7 @@ export function WebGLShader() {
     }
 
     const animate = () => {
-      if (refs.uniforms) refs.uniforms.time.value += 0.01
+      if (refs.uniforms) refs.uniforms.time.value += 0.01;
       if (refs.renderer && refs.scene && refs.camera) {
         refs.renderer.render(refs.scene, refs.camera)
       }
@@ -134,7 +169,7 @@ export function WebGLShader() {
       }
       refs.renderer?.dispose()
     }
-  }, [])
+  }, []) // Dependency array empty for init only - theme side effect handles the rest
 
   return (
     <canvas

@@ -18,7 +18,7 @@ export function HeroSection() {
                     {letters.map((letter, i) => (
                         <motion.h1
                             key={i}
-                            className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-neutral-50 to-neutral-500"
+                            className="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-neutral-50 to-neutral-500 dark:from-neutral-50 dark:to-neutral-500 light:from-black light:to-neutral-600"
                             initial={{ opacity: 0, y: 50, filter: "blur(10px)" }}
                             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                             transition={{
@@ -34,14 +34,14 @@ export function HeroSection() {
                 </div>
 
                 <motion.p
-                    className="text-lg md:text-2xl text-neutral-400 font-light tracking-wide max-w-xl px-4"
+                    className="text-lg md:text-2xl text-neutral-400 dark:text-neutral-400 light:text-neutral-600 font-light tracking-wide max-w-xl px-4"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.8 }}
                 >
                     Software & AI Systems Engineer
                     <br />
-                    <span className="flex items-center justify-center text-sm md:text-lg text-blue-400 mt-2 italic"><span className="w-2 h-2 inline-block rounded-full bg-blue-500 mr-2 animate-pulse" />Building Systems That Think & Scale</span>
+                    <span className="flex items-center justify-center text-sm md:text-lg text-blue-500 mt-2 italic font-medium"><span className="w-2 h-2 inline-block rounded-full bg-blue-500 mr-2 animate-pulse" />Building Systems That Think & Scale</span>
                 </motion.p>
                 
                 <div className="my-8 flex items-center justify-center gap-2">
@@ -49,7 +49,7 @@ export function HeroSection() {
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75"></span>
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
                     </span>
-                    <p className="text-xs md:text-sm text-blue-400">Available for New Projects</p>
+                    <p className="text-xs md:text-sm text-blue-500 dark:text-blue-400 light:text-blue-600 font-medium">Available for New Projects</p>
                 </div>
                 
                 <motion.div
@@ -59,7 +59,7 @@ export function HeroSection() {
                 >
                     <LiquidButton 
                         onClick={scrollToAbout}
-                        className="text-white border-white/20 rounded-full bg-white/5" 
+                        className="text-neutral-900 dark:text-white light:text-neutral-900 border-neutral-300 dark:border-white/20 light:border-neutral-300 rounded-full bg-neutral-100 dark:bg-white/5 light:bg-neutral-100/50 shadow-lg" 
                         size={'xl'}
                     >
                         Explore Portfolio
