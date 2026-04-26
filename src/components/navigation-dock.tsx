@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Briefcase, Code2, Layers, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
+import { User, Briefcase, Code2, Layers, Mail, Sun, Moon } from "lucide-react";
 
 const NAV_ITEMS = [
     { label: "About", icon: User, href: "#about" },
@@ -14,8 +15,12 @@ const NAV_ITEMS = [
 
 export function NavigationDock() {
     const [activeSection, setActiveSection] = useState("");
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
 
+    // Prevent hydration mismatch
     useEffect(() => {
+        setMounted(true);
         const handleScroll = () => {
             const sections = NAV_ITEMS.map(item => item.href.substring(1));
             let current = "";
@@ -49,33 +54,33 @@ export function NavigationDock() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1, duration: 0.8, type: "spring" }}
         >
-            <div className="flex items-center gap-2 px-4 py-3 bg-neutral-900/60 backdrop-blur-xl border border-neutral-800 rounded-full shadow-2xl">
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-neutral-900/60 dark:bg-neutral-900/60 light:bg-white/60 backdrop-blur-xl border border-neutral-800 dark:border-neutral-800 light:border-neutral-200 rounded-full shadow-2xl">
                 {NAV_ITEMS.map((item) => {
                     const isActive = activeSection === item.href.substring(1);
                     return (
                         <button
                             key={item.label}
                             onClick={() => scrollTo(item.href)}
-                            className={`relative p-3 rounded-full transition-all duration-300 hover:bg-neutral-800 ${
-                                isActive ? "text-blue-400" : "text-neutral-400 hover:text-neutral-200"
+                            className={`relative p-2.5 rounded-full transition-all duration-300 ${
+                                isActive 
+                                ? "text-blue-400 bg-neutral-800/50" 
+                                : "text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/30"
                             }`}
                         >
-                            {isActive && (
-                                <motion.div 
-                                    className="absolute inset-0 bg-neutral-800 rounded-full -z-10"
-                                    layoutId="dock-active"
-                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                />
-                            )}
-                            <item.icon size={20} />
-                            
-                            {/* Hover Tooltip */}
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2 py-1 bg-neutral-800 border border-neutral-700 text-xs rounded opacity-0 pointer-events-none transition-opacity duration-200 hover:opacity-100 peer-hover:opacity-100 hidden group-hover:block">
-                                {item.label}
-                            </div>
+                            <item.icon size={18} />
                         </button>
                     )
                 })}
+                
+                <div className="w-[1px] h-6 bg-neutral-800 mx-1" />
+
+                <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="p-2.5 rounded-full text-neutral-400 hover:text-blue-400 hover:bg-neutral-800/30 transition-all duration-300"
+                    aria-label="Toggle Theme"
+                >
+                    {mounted && (theme === "dark" ? <Sun size={18} /> : <Moon size={18} />)}
+                </button>
             </div>
         </motion.div>
     );

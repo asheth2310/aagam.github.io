@@ -50,34 +50,37 @@ export function AiChatWidget() {
         setInput(e.target.value);
     };
 
+    const handleSuggestionClick = (text: string) => {
+        handleChatSubmission(text);
+    };
+
+    const handleChatSubmission = async (text: string) => {
+        if (!text.trim() || isLoading) return;
+        
+        // 1. Add user message
+        const userMsg = { id: Date.now().toString(), role: 'user' as const, content: text };
+        setMessages(prev => [...prev, userMsg]);
+
+        // 2. Local fallback is now the primary fast responder
+        setTimeout(() => {
+            const fallbackMsg = { 
+                id: (Date.now() + 1).toString(), 
+                role: 'assistant' as const, 
+                content: getFallbackAnswer(text) 
+            };
+            setMessages(prev => [...prev, fallbackMsg]);
+        }, 400);
+
+        // 3. (Optional) Try keep the API call in background just in case
+        try { sendMessage({ content: text }).catch(() => {}); } catch(e) {}
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const currentInput = input.trim();
-        if (!currentInput || isLoading) return;
-        
+        if (!currentInput) return;
         setInput("");
-
-        // 1. Immediately add user message using functional update for reliability
-        const userMsg = { id: Date.now().toString(), role: 'user' as const, content: currentInput };
-        setMessages(prev => [...prev, userMsg]);
-
-        try {
-            // 2. Try live AI - Note: if the API Key is missing on Vercel, this throws an error
-            // Using functional sendMessage to keep state sync
-            await sendMessage({ content: currentInput });
-        } catch (err) {
-            console.error("Assistant Connection Issue:", err);
-            
-            // 3. Robust Fallback: If Live AI fails, use Aagam's Local Brain
-            setTimeout(() => {
-                const fallbackMsg = { 
-                    id: (Date.now() + 1).toString(), 
-                    role: 'assistant' as const, 
-                    content: getFallbackAnswer(currentInput) 
-                };
-                setMessages(prev => [...prev, fallbackMsg]);
-            }, 500);
-        }
+        handleChatSubmission(currentInput);
     };
 
     // Auto-scroll logic
@@ -172,6 +175,20 @@ export function AiChatWidget() {
                                     </div>
                                 )}
                             </div>
+
+                            {messages.length <= 1 && (
+                                <div className="px-4 py-2 flex flex-wrap gap-2 overflow-x-auto no-scrollbar border-t border-neutral-800">
+                                    {["View Top Projects", "Check My Skills", "How to Contact", "About Aagam"].map((s) => (
+                                        <button
+                                            key={s}
+                                            onClick={() => handleSuggestionClick(s)}
+                                            className="whitespace-nowrap px-3 py-1.5 rounded-full bg-blue-600/10 border border-blue-500/30 text-blue-400 text-xs hover:bg-blue-600/20 transition-colors"
+                                        >
+                                            {s}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
 
                             <form 
                                 onSubmit={handleSubmit}

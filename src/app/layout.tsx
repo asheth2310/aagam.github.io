@@ -10,16 +10,25 @@ export const metadata: Metadata = {
   description: "Highly interactive 3D developer portfolio",
 };
 
+import { ThemeProvider } from "@/components/theme-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.className} antialiased bg-neutral-950 text-neutral-50`}>
-        {children}
-        <AiChatWidget />
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} antialiased selection:bg-blue-500/30`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <AiChatWidget />
+        </ThemeProvider>
       </body>
     </html>
   );
