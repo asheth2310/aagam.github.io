@@ -88,20 +88,23 @@ export function WebGLShader() {
           b = pow(b, 0.8) * 0.4;
         }
 
-        gl_FragColor = vec4(r, g, b, 1.0);
+        float alpha = max(r, max(g, b)) * (isDark > 0.5 ? 2.0 : 10.0);
+        gl_FragColor = vec4(r, g, b, clamp(alpha, 0.0, 1.0));
       }
     `
 
     const initScene = () => {
       refs.scene = new THREE.Scene()
-      refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+      // Enable alpha for transparency
+      refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
       refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       
-      const currentTheme = resolvedTheme || theme || "dark"
-      refs.renderer.setClearColor(new THREE.Color(currentTheme === "dark" ? 0x000000 : 0xFFFFFF))
+      // Transparent background so CSS background shows through
+      refs.renderer.setClearColor(0x000000, 0) 
 
       refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1)
 
+      const currentTheme = resolvedTheme || theme || "dark"
       refs.uniforms = {
         resolution: { value: [window.innerWidth, window.innerHeight] },
         time: { value: 0.0 },
@@ -129,6 +132,7 @@ export function WebGLShader() {
         fragmentShader,
         uniforms: refs.uniforms,
         side: THREE.DoubleSide,
+        transparent: true, // Crucial for alpha support
       })
 
       refs.mesh = new THREE.Mesh(geometry, material)
