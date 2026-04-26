@@ -52,35 +52,42 @@ export function AiChatWidget() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!input.trim() || isLoading) return;
+        const currentInput = input.trim();
+        if (!currentInput || isLoading) return;
         
-        const currentInput = input;
         setInput("");
 
-        // Immediately add user message to UI
+        // 1. Immediately add user message using functional update for reliability
         const userMsg = { id: Date.now().toString(), role: 'user' as const, content: currentInput };
-        setMessages([...messages, userMsg]);
+        setMessages(prev => [...prev, userMsg]);
 
         try {
-            // Try live AI first
-            await sendMessage({ text: currentInput });
+            // 2. Try live AI - Note: if the API Key is missing on Vercel, this throws an error
+            // Using functional sendMessage to keep state sync
+            await sendMessage({ content: currentInput });
         } catch (err) {
-            console.error("AI API Error, using live-fallback:", err);
-            // On error (like quota exceeded), provide a local "Static" response immediately
+            console.error("Assistant Connection Issue:", err);
+            
+            // 3. Robust Fallback: If Live AI fails, use Aagam's Local Brain
             setTimeout(() => {
                 const fallbackMsg = { 
                     id: (Date.now() + 1).toString(), 
                     role: 'assistant' as const, 
                     content: getFallbackAnswer(currentInput) 
                 };
-                setMessages((prev) => [...prev, fallbackMsg]);
-            }, 300);
+                setMessages(prev => [...prev, fallbackMsg]);
+            }, 500);
         }
     };
 
+    // Auto-scroll logic
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            const scrollContainer = scrollRef.current;
+            scrollContainer.scrollTo({
+                top: scrollContainer.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     }, [messages, isOpen]);
 
