@@ -135,7 +135,6 @@ export function AiChatWidget() {
                                 <div className="flex items-center gap-2">
                                     <Sparkles size={16} className="text-blue-500" />
                                     <span className="font-semibold text-neutral-100">AI Assistant</span>
-                                    {error && <span className="text-[10px] bg-neutral-800 text-neutral-400 px-1.5 py-0.5 rounded uppercase">Local Mode</span>}
                                 </div>
                                 <button 
                                     onClick={() => setIsOpen(false)}
