@@ -32,6 +32,27 @@ const PROJECTS = [
         repoName: "nlp-document-platform",
         stars: 56,
         tags: ["Python", "Transformers", "NLP", "Machine Learning"]
+    },
+    {
+        title: "Internal Workflow Automation Tool",
+        description: "Full-stack internal tool to automate document workflows with intake forms, status tracking, and audit trails for non-technical stakeholders.",
+        repoName: "workflow-automation-tool",
+        stars: 28,
+        tags: ["Python", "FastAPI", "React", "PostgreSQL", "Docker"]
+    },
+    {
+        title: "E-Commerce Microservices Platform",
+        description: "Scalable distributed system with 5 microservices for user management, inventory, orders, and payments deployed on AWS EC2 with Kafka event-driven architecture.",
+        repoName: "ecommerce-microservices-platform",
+        stars: 41,
+        tags: ["Java", "Spring Boot", "Kafka", "PostgreSQL", "Docker"]
+    },
+    {
+        title: "Real-Time Analytics Platform",
+        description: "Serverless data processing pipeline using AWS Lambda and DynamoDB with a live React dashboard over WebSockets. Sub-500ms latency.",
+        repoName: "realtime-analytics-platform",
+        stars: 37,
+        tags: ["Python", "AWS Lambda", "DynamoDB", "React", "WebSockets"]
     }
 ];
 
