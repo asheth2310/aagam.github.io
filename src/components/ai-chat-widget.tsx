@@ -16,7 +16,7 @@ const FALLBACK_ANSWERS: Record<string, string> = {
     "contact": "You can reach Aagam via the **Contact Section** at the very bottom of this page. You can also find his **LinkedIn and GitHub** links in the navigation dock below.",
     "who": "Aagam Sheth is a Software & AI Systems Engineer who bridges the gap between high-performance web engineering and complex AI systems.",
     "experience": "Aagam has deep expertise in building scalable distributed microservices, AI-powered automation, and high-fidelity 3D user interfaces.",
-    "default": "I'm currently in 'Local Info Mode' as my live brain is taking a quick break (OpenAI quota reached). I can still tell you about Aagam's skills, projects, or how to contact him!"
+    "default": "I'm here to help you navigate Aagam's work! Feel free to ask about his **Technical Skills**, **Portfolio Projects**, or find out the best way to **Contact** him directly."
 };
 
 function getFallbackAnswer(input: string): string {
